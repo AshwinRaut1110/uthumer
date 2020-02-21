@@ -1,6 +1,7 @@
 from googleapiclient.discovery import build
 from urllib.request import urlretrieve
 from configparser import ConfigParser
+import argparse
 
 
 class Uthumer:
@@ -38,7 +39,22 @@ class Uthumer:
         thumb_url = self.get_largest_thumb_url(thumbs)
         urlretrieve(thumb_url, path)
 
+    def get_video_id(self, url):
+        sanitized_url = url.strip('/')
+        if 'youtu.be' in sanitized_url:
+            id = sanitized_url.split('youtu.be/')[1]
+        else:
+            id = sanitized_url.split('watch?v=')[1]
+        return id
+
 if __name__ == '__main__':
     uthumer = Uthumer()
-    video_id = 'U-iEK0mlmuQ'
-    uthumer.download_thumb(video_id)
+    parser = argparse.ArgumentParser(description="Downloads a Youtube video thumbnail.")
+    parser.add_argument('url',
+                        help='Youtube video URL',
+                        default=None)
+    parser_args = parser.parse_args()
+    url = parser_args.url
+    if url:
+        video_id = uthumer.get_video_id(url)
+        uthumer.download_thumb(video_id)
